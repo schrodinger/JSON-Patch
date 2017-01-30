@@ -1,10 +1,11 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * json-patch-duplex.js version: 1.1.6
+ * json-patch-duplex.js version: 1.1.7
  * (c) 2013 Joachim Wester
  * MIT license
  */
 
+//NOTE (asif) You must manually remove calls to .default in js compiled file
 import cloneDeep from 'lodash/cloneDeep';
 
 interface HTMLElement {

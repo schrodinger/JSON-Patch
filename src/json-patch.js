@@ -1,6 +1,6 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * json-patch-duplex.js version: 1.1.6
+ * json-patch-duplex.js version: 1.1.7
  * (c) 2013 Joachim Wester
  * MIT license
  */
@@ -82,7 +82,7 @@ var jsonpatch;
             apply(tree, [getOriginalDestination]);
             // In case value is moved up and overwrites its ancestor
             var original = getOriginalDestination.value === undefined ?
-                undefined : cloneDeep_1.default(getOriginalDestination.value);
+                undefined : cloneDeep_1(getOriginalDestination.value);
             var temp = { op: "_get", path: this.from };
             apply(tree, [temp]);
             apply(tree, [
@@ -367,7 +367,7 @@ var jsonpatch;
                 throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
             }
             if (tree) {
-                tree = cloneDeep_1.default(tree); //clone tree so that we can safely try applying operations
+                tree = cloneDeep_1(tree); //clone tree so that we can safely try applying operations
                 apply.call(this, tree, sequence, true);
             }
             else {
