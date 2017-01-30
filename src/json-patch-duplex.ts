@@ -5,6 +5,8 @@
  * MIT license
  */
 
+import _ from 'lodash';
+
 interface HTMLElement {
   attachEvent: Function;
   detachEvent: Function;
@@ -98,7 +100,7 @@ module jsonpatch {
       apply(tree, [getOriginalDestination]);
       // In case value is moved up and overwrites its ancestor
       var original = getOriginalDestination.value === undefined ?
-        undefined : JSON.parse(JSON.stringify(getOriginalDestination.value));
+        undefined : _.cloneDeep(getOriginalDestination.value);
 
       var temp: any = { op: "_get", path: this.from };
       apply(tree, [temp]);
@@ -274,7 +276,7 @@ module jsonpatch {
   function deepClone(obj: any) {
     switch (typeof obj) {
       case "object":
-        return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+      return _.cloneDeep(obj);
 
       case "undefined":
         return null; //this is how JSON.stringify behaves for array items
@@ -645,7 +647,7 @@ module jsonpatch {
       }
 
       if (tree) {
-        tree = JSON.parse(JSON.stringify(tree)); //clone tree so that we can safely try applying operations
+        tree = _.cloneDeep(tree); //clone tree so that we can safely try applying operations
         apply.call(this, tree, sequence, true);
       }
       else {

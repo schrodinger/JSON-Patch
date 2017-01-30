@@ -4,6 +4,7 @@
  * (c) 2013 Joachim Wester
  * MIT license
  */
+import _ from 'lodash';
 
 module jsonpatch {
   var _objectKeys = function (obj) {
@@ -93,7 +94,7 @@ module jsonpatch {
       apply(tree, [getOriginalDestination]);
       // In case value is moved up and overwrites its ancestor
       var original = getOriginalDestination.value === undefined ?
-        undefined : JSON.parse(JSON.stringify(getOriginalDestination.value));
+        undefined : _.cloneDeep(getOriginalDestination.value);
 
       var temp: any = { op: "_get", path: this.from };
       apply(tree, [temp]);
@@ -394,7 +395,7 @@ module jsonpatch {
       }
 
       if (tree) {
-        tree = JSON.parse(JSON.stringify(tree)); //clone tree so that we can safely try applying operations
+        tree = _.cloneDeep(tree); //clone tree so that we can safely try applying operations
         apply.call(this, tree, sequence, true);
       }
       else {
