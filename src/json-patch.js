@@ -1,9 +1,10 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * json-patch-duplex.js version: 1.1.4
+ * json-patch-duplex.js version: 1.1.5
  * (c) 2013 Joachim Wester
  * MIT license
  */
+var lodash_1 = require("lodash");
 var jsonpatch;
 (function (jsonpatch) {
     var _objectKeys = function (obj) {
@@ -81,7 +82,7 @@ var jsonpatch;
             apply(tree, [getOriginalDestination]);
             // In case value is moved up and overwrites its ancestor
             var original = getOriginalDestination.value === undefined ?
-                undefined : JSON.parse(JSON.stringify(getOriginalDestination.value));
+                undefined : lodash_1.default.cloneDeep(getOriginalDestination.value);
             var temp = { op: "_get", path: this.from };
             apply(tree, [temp]);
             apply(tree, [
@@ -273,12 +274,13 @@ var jsonpatch;
     var JsonPatchError = (function (_super) {
         __extends(JsonPatchError, _super);
         function JsonPatchError(message, name, index, operation, tree) {
-            _super.call(this, message);
-            this.message = message;
-            this.name = name;
-            this.index = index;
-            this.operation = operation;
-            this.tree = tree;
+            var _this = _super.call(this, message) || this;
+            _this.message = message;
+            _this.name = name;
+            _this.index = index;
+            _this.operation = operation;
+            _this.tree = tree;
+            return _this;
         }
         return JsonPatchError;
     }(Error));
@@ -365,7 +367,7 @@ var jsonpatch;
                 throw new JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
             }
             if (tree) {
-                tree = JSON.parse(JSON.stringify(tree)); //clone tree so that we can safely try applying operations
+                tree = lodash_1.default.cloneDeep(tree); //clone tree so that we can safely try applying operations
                 apply.call(this, tree, sequence, true);
             }
             else {
