@@ -1,11 +1,11 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * json-patch-duplex.js version: 1.1.4
+ * json-patch-duplex.js version: 1.1.6
  * (c) 2013 Joachim Wester
  * MIT license
  */
 
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 interface HTMLElement {
   attachEvent: Function;
@@ -100,7 +100,7 @@ module jsonpatch {
       apply(tree, [getOriginalDestination]);
       // In case value is moved up and overwrites its ancestor
       var original = getOriginalDestination.value === undefined ?
-        undefined : _.cloneDeep(getOriginalDestination.value);
+        undefined : cloneDeep(getOriginalDestination.value);
 
       var temp: any = { op: "_get", path: this.from };
       apply(tree, [temp]);
@@ -276,7 +276,7 @@ module jsonpatch {
   function deepClone(obj: any) {
     switch (typeof obj) {
       case "object":
-      return _.cloneDeep(obj);
+      return cloneDeep(obj);
 
       case "undefined":
         return null; //this is how JSON.stringify behaves for array items
@@ -647,7 +647,7 @@ module jsonpatch {
       }
 
       if (tree) {
-        tree = _.cloneDeep(tree); //clone tree so that we can safely try applying operations
+        tree = cloneDeep(tree); //clone tree so that we can safely try applying operations
         apply.call(this, tree, sequence, true);
       }
       else {

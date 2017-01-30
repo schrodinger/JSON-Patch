@@ -1,10 +1,10 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * json-patch-duplex.js version: 1.1.4
+ * json-patch-duplex.js version: 1.1.6
  * (c) 2013 Joachim Wester
  * MIT license
  */
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 module jsonpatch {
   var _objectKeys = function (obj) {
@@ -94,7 +94,7 @@ module jsonpatch {
       apply(tree, [getOriginalDestination]);
       // In case value is moved up and overwrites its ancestor
       var original = getOriginalDestination.value === undefined ?
-        undefined : _.cloneDeep(getOriginalDestination.value);
+        undefined : cloneDeep(getOriginalDestination.value);
 
       var temp: any = { op: "_get", path: this.from };
       apply(tree, [temp]);
@@ -395,7 +395,7 @@ module jsonpatch {
       }
 
       if (tree) {
-        tree = _.cloneDeep(tree); //clone tree so that we can safely try applying operations
+        tree = cloneDeep(tree); //clone tree so that we can safely try applying operations
         apply.call(this, tree, sequence, true);
       }
       else {
