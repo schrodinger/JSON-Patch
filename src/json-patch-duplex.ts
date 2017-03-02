@@ -1,12 +1,9 @@
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
- * json-patch-duplex.js version: 1.1.8
+ * json-patch-duplex.js version: 1.1.9
  * (c) 2013 Joachim Wester
  * MIT license
  */
-
-//NOTE (asif) You must manually remove calls to .default in js compiled file
-import cloneDeep from 'lodash/cloneDeep';
 
 interface HTMLElement {
   attachEvent: Function;
@@ -101,7 +98,7 @@ module jsonpatch {
       apply(tree, [getOriginalDestination]);
       // In case value is moved up and overwrites its ancestor
       var original = getOriginalDestination.value === undefined ?
-        undefined : cloneDeep(getOriginalDestination.value);
+        undefined : getOriginalDestination.value;
 
       var temp: any = { op: "_get", path: this.from };
       apply(tree, [temp]);
@@ -277,7 +274,7 @@ module jsonpatch {
   function deepClone(obj: any) {
     switch (typeof obj) {
       case "object":
-      return cloneDeep(obj);
+        return obj;
 
       case "undefined":
         return null; //this is how JSON.stringify behaves for array items
@@ -373,7 +370,7 @@ module jsonpatch {
         break;
       }
     }
-    _generate(mirror.value, observer.object, observer.patches, "");
+    _generate(mirror.value, observer.object, observer.patches, []);
     if (observer.patches.length) {
       apply(mirror.value, observer.patches);
     }
@@ -388,7 +385,7 @@ module jsonpatch {
   }
 
   // Dirty check if obj is different from mirror, generate patches and update mirror
-  function _generate(mirror, obj, patches, path) {
+  function _generate(mirror, obj, patches, path, prefilter?) {
     var newKeys = _objectKeys(obj);
     var oldKeys = _objectKeys(mirror);
     var changed = false;
@@ -399,20 +396,36 @@ module jsonpatch {
     for (var t = oldKeys.length - 1; t >= 0; t--) {
       var key = oldKeys[t];
       var oldVal = mirror[key];
-      if (obj.hasOwnProperty(key) && !(obj[key] === undefined && oldVal !== undefined && _isArray(obj) === false)) {
+      
+      var objCompare = obj.hasOwnProperty(key) && !(obj[key] === undefined && oldVal !== undefined && _isArray(obj) === false)
+      if (!objCompare) {
+        deleted = true;
+      }
+
+      if (prefilter && prefilter(path, key)) {
+        continue;
+      }
+
+      if (objCompare) {
         var newVal = obj[key];
         if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null && oldVal !== newVal) {
-          _generate(oldVal, newVal, patches, path + "/" + escapePathComponent(key));
+          var newPath = path.slice(0);
+          newPath.push(escapePathComponent(key));
+          _generate(oldVal, newVal, patches, newPath, prefilter);
         }
         else {
           if (oldVal !== newVal) {
             changed = true;
-            patches.push({ op: "replace", path: path + "/" + escapePathComponent(key), value: deepClone(newVal) });
+            var newPath = path.slice(0);
+            newPath.push(escapePathComponent(key));
+            patches.push({ op: "replace", path: newPath, value: deepClone(newVal) });
           }
         }
       }
       else {
-        patches.push({ op: "remove", path: path + "/" + escapePathComponent(key) });
+        var newPath = path.slice(0);
+        newPath.push(escapePathComponent(key));
+        patches.push({ op: "remove", path: newPath });
         deleted = true; // property has been deleted
       }
     }
@@ -424,7 +437,9 @@ module jsonpatch {
     for (var t = 0; t < newKeys.length; t++) {
       var key = newKeys[t];
       if (!mirror.hasOwnProperty(key) && obj[key] !== undefined) {
-        patches.push({ op: "add", path: path + "/" + escapePathComponent(key), value: deepClone(obj[key]) });
+      var newPath = path.slice(0);
+        newPath.push(escapePathComponent(key));
+        patches.push({ op: "add", path: newPath, value: deepClone(obj[key]) });
       }
     }
   }
@@ -472,10 +487,9 @@ module jsonpatch {
       patch = patches[p];
       p++;
       // Find the object
-      var path = patch.path || "";
-      var keys = path.split('/');
+      var keys = patch.path || [];
       var obj = tree;
-      var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
+      var t = 0; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
       var len = keys.length;
       var existingPathFragment = undefined;
 
@@ -535,9 +549,9 @@ module jsonpatch {
     return results;
   }
 
-  export function compare(tree1: any, tree2: any): any[] {
+  export function compare(tree1: any, tree2: any, prefilter: any): any[] {
     var patches = [];
-    _generate(tree1, tree2, patches, '');
+    _generate(tree1, tree2, patches, [], prefilter);
     return patches;
   }
 
@@ -648,7 +662,6 @@ module jsonpatch {
       }
 
       if (tree) {
-        tree = cloneDeep(tree); //clone tree so that we can safely try applying operations
         apply.call(this, tree, sequence, true);
       }
       else {
