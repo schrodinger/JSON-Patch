@@ -5,7 +5,11 @@
   "homepage": "http://benchmarkjs.com/",
   "license": "MIT",
   "main": "benchmark.js",
-  "keywords": ["benchmark", "performance", "speed"],
+  "keywords": [
+    "benchmark",
+    "performance",
+    "speed"
+  ],
   "author": "Mathias Bynens <mathias@qiwi.be> (http://mathiasbynens.be/)",
   "contributors": [
     "Mathias Bynens <mathias@qiwi.be> (http://mathiasbynens.be/)",
@@ -14,10 +18,12 @@
   ],
   "bugs": "https://github.com/bestiejs/benchmark.js/issues",
   "repository": "bestiejs/benchmark.js",
-  "scripts": { "test": "echo \"See the repository CONTRIBUTING.md for testing instructions.\"" },
+  "scripts": {
+    "test": "echo \"See the repository CONTRIBUTING.md for testing instructions.\""
+  },
   "dependencies": {
-    "lodash": "~2.4.1",
-    "platform": "~1.1.0"
+    "lodash": "4.17.15",
+    "platform": "1.3.5"
   },
   "engines": [
     "node",
