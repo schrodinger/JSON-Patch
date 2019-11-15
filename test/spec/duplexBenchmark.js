@@ -1,9 +1,9 @@
 var obj, obj2, patches;
 if (typeof window === 'undefined') {
-    var jsdom = require("jsdom").jsdom;
-    var doc = jsdom(undefined, undefined);
-    GLOBAL.window = doc.defaultView;
-    GLOBAL.document = doc.defaultView.document;
+    const { JSDOM } = require("jsdom");
+    const dom = new JSDOM();
+    global.window = dom.window;
+    global.document = dom.window.document;
 }
 
 if (typeof jsonpatch === 'undefined') {
