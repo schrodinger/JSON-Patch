@@ -36,7 +36,7 @@
     "jasmine": "^2.5.1",
     "jsdom": "15.2.0",
     "jsonfile": "5.0.0",
-    "underscore": "1.9.1"
+    "underscore": "1.12.1"
   },
   "scripts": {
     "tsc": "tsc",
